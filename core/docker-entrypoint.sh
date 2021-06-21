@@ -224,10 +224,29 @@ echo "HYPERKITTY_API_KEY not defined, skipping HyperKitty setup..."
 
 fi
 
+mkdir -p /opt/mailmandb
+# Create empty DB to ensure it exists
+touch /opt/mailmandb/mailmanweb.db
+# Open it up so it can be easily read
+chmod a+rw /opt/mailmandb -R
+# Setup DB perms
+chown mailman /opt/mailmandb -R
+
 # Generate the LMTP files for postfix if needed.
 mailman aliases
 
 # Now chown the places where mailman wants to write stuff.
 chown -R mailman /opt/mailman
+# And make it readable easily
+chmod a+rw /opt/mailman -R
 
+export PYTHONPATH=$PYTHONPATH:/usr/mailman_scripts
+chmod u+rx /usr/mailman_scripts -R
+
+if [[ -v INIT_DEV ]]; then
+	echo "Initializing dev environment"
+	mailman shell --run init_dev
+fi
+
+echo "Starting main runner	"
 exec su-exec mailman "$@"

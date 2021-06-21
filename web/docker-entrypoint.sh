@@ -89,6 +89,11 @@ then
 	wait_for_mysql
 fi
 
+mkdir -p /opt/mailmandb
+touch /opt/mailmandb/mailmanweb.db
+chown mailman:mailman /opt/mailmandb -R
+chmod a+rw /opt/mailmandb -R
+
 # Check if we are in the correct directory before running commands.
 if [[ ! $(pwd) == '/opt/mailman-web' ]]; then
 	echo "Running in the wrong directory...switching to /opt/mailman-web"
@@ -112,6 +117,8 @@ if [[ -e /opt/mailman-web-data/settings_local.py ]]; then
 	echo "Copying settings_local.py ..."
 	cp /opt/mailman-web-data/settings_local.py /opt/mailman-web/settings_local.py
 	chown mailman:mailman /opt/mailman-web/settings_local.py
+	chmod a+rw /opt/mailman-web/settings_local.py
+	chmod a+rw /opt/mailman-web-data/settings_local.py
 else
 	echo "settings_local.py not found, it is highly recommended that you provide one"
 	echo "Using default configuration to run."
@@ -126,10 +133,11 @@ SITE_DIR=$(python3 -c 'import site; print(site.getsitepackages()[0])')
 echo "Compiling locale files in $SITE_DIR"
 cd $SITE_DIR && /opt/mailman-web/manage.py compilemessages &&  cd -
 
+echo "Compressing static files"
 # Compress static files.
 python3 manage.py compress --force
 
-
+echo "Applying migrations"
 # Migrate all the data to the database if this is a new installation, otherwise
 # this command will upgrade the database.
 python3 manage.py migrate
@@ -157,5 +165,9 @@ fi
 # Create a mailman user with the specific UID and GID and do not create home
 # directory for it. Also chown the logs directory to write the files.
 chown mailman:mailman /opt/mailman-web-data -R
+
+mkdir -p /tmp/mailman-messages
+chown -R mailman:mailman /tmp/mailman-messages
+chmod a+rw /tmp/mailman-messages -R
 
 exec $@

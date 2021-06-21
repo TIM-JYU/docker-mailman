@@ -2,58 +2,67 @@ version: '2'
 
 services:
   mailman-core:
-    image: maxking/mailman-core:0.3
-    container_name: mailman-core
+    image: mailman-core:latest
     hostname: mailman-core
     volumes:
-    - /opt/mailman/core:/opt/mailman/
+      - ./mailman/mailman-extra.cfg:/opt/mailman/mailman-extra.cfg
+      - ./db:/opt/mailmandb
     stop_grace_period: 30s
-    links:
-    - database:database
-    depends_on:
-    - database
     environment:
-    - DATABASE_URL=postgres://mailman:mailmanpass@database/mailmandb
-    - DATABASE_TYPE=postgres
-    - DATABASE_CLASS=mailman.database.postgresql.PostgreSQLDatabase
-    - HYPERKITTY_API_KEY=someapikey
+      - DATABASE_TYPE=sqlite
+      - DATABASE_URL=sqlite:////opt/mailmandb/mailmanweb.db
+      - DATABASE_CLASS=mailman.database.sqlite.SQLiteDatabase
+      - HYPERKITTY_API_KEY=test
+      - HYPERKITTY_URL=http://mailman-web:8000/mailman3/hyperkitty/
+      - INIT_DEV=1
     ports:
-    - "127.0.0.1:8001:8001" # API
-    - "127.0.0.1:8024:8024" # LMTP - incoming emails
+      - "8001:8001" # API
+      - "8024:8024" # LMTP - incoming emails
     networks:
       mailman:
 
   mailman-web:
-    image: maxking/mailman-web:0.3
-    container_name: mailman-web
+    image: mailman-web:latest
     hostname: mailman-web
     depends_on:
-    - database
+      - mailman-core
     links:
-    - mailman-core:mailman-core
-    - database:database
+      - mailman-core:mailman-core
     volumes:
-    - /opt/mailman/web:/opt/mailman-web-data
+      - ./mailman/web:/opt/mailman-web-data
+      - ./messages:/tmp/mailman-messages
+      - ./db:/opt/mailmandb
     environment:
-    - DATABASE_TYPE=postgres
-    - DATABASE_URL=postgres://mailman:mailmanpass@database/mailmandb
-    - HYPERKITTY_API_KEY=someapikey
-    ports:
-    - "127.0.0.1:8000:8000" # HTTP
-    - "127.0.0.1:8080:8080" # uwsgi
+      - DATABASE_TYPE=sqlite
+      - DATABASE_URL=sqlite:////opt/mailmandb/mailmanweb.db
+      - DATABASE_CLASS=mailman.database.sqlite.SQLiteDatabase
+      - HYPERKITTY_API_KEY=test
+      - SECRET_KEY=test
+      - MAILMAN_ADMIN_USER=admin
+      - MAILMAN_ADMIN_EMAIL=admin@example.com
+      - SERVE_FROM_DOMAIN=localhost
+      - URL_BASE_DIR=mailman3
     networks:
       mailman:
 
-  database:
-    environment:
-    - POSTGRES_DB=mailmandb
-    - POSTGRES_USER=mailman
-    - POSTGRES_PASSWORD=mailmanpass
-    image: postgres:9.6-alpine
+  caddy:
+    image: caddy:2.3.0-alpine
+    restart: unless-stopped
+    depends_on: 
+      - mailman-web
+    ports:
+      - "8000:80"
     volumes:
-    - /opt/mailman/database:/var/lib/postgresql/data
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./mailman/web/static:/var/www/mailman3/static
+      - caddy_data:/data
+      - caddy_config:/config
     networks:
       mailman:
+
+volumes: 
+  caddy_data:
+  caddy_config:
 
 networks:
    mailman:

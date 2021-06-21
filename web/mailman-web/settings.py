@@ -401,6 +401,10 @@ CACHES = {
     },
 }
 
+if os.environ.get('URL_BASE_DIR', None):
+    STATIC_URL = f'/{os.environ["URL_BASE_DIR"]}/static/'
+    MEDIA_URL = f'/{os.environ["URL_BASE_DIR"]}/media/'
+
 try:
     from settings_local import *
 except ImportError:

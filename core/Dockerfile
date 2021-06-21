@@ -1,10 +1,5 @@
 FROM alpine:3.12
 
-MAINTAINER Abhilash Raj
-
-#Add startup script to container
-COPY docker-entrypoint.sh /usr/local/bin/
-
 #Install all required packages, add user for executing mailman and set execution rights for startup script
 RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev postgresql-dev \
@@ -18,8 +13,14 @@ RUN apk update \
                    mailman-hyperkitty==1.1.0 \
                    pymysql \
                    'sqlalchemy<1.4.0' \
+ # Also install nano for easy text editing
+    && apk add nano \
     && apk del build-deps \
     && adduser -S mailman
+
+#Add startup script to container
+COPY docker-entrypoint.sh /usr/local/bin/
+COPY assets/scripts /usr/mailman_scripts
 
 # Change the working directory.
 WORKDIR /opt/mailman

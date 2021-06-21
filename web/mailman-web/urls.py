@@ -21,6 +21,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
+import os
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(
@@ -33,3 +34,6 @@ urlpatterns = [
     # Django admin
     url(r'^admin/', admin.site.urls),
 ]
+
+if os.environ.get('URL_BASE_DIR', None):
+    urlpatterns = [url(rf'^{os.environ["URL_BASE_DIR"]}/', include(urlpatterns))]

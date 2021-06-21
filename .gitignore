@@ -5,3 +5,7 @@
 /web/mailman-web/settings_local.py
 pythonenv3.8/*
 .venv/*
+/db
+/mailman
+/messages
+Caddyfile
