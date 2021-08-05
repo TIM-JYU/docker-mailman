@@ -22,6 +22,9 @@ RUN apk update \
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY assets/scripts /usr/mailman_scripts
 
+RUN mkdir /plugins
+ENV PYTHONPATH "${PYTHONPATH}:/plugins"
+
 # Change the working directory.
 WORKDIR /opt/mailman
 

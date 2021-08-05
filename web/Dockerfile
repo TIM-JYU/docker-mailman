@@ -19,7 +19,6 @@ RUN set -ex \
 		psycopg2 \
 		dj-database-url \
 		mysqlclient \
-		typing \
 		xapian-haystack \
 		django-auth-ldap \
 		python-memcached \
@@ -37,6 +36,9 @@ RUN addgroup -S mailman \
 	&& adduser -S -G mailman mailman \
 	&& chown -R mailman /opt/mailman-web/ \
 	&& chmod u+x /opt/mailman-web/manage.py
+
+RUN mkdir /plugins
+ENV PYTHONPATH "${PYTHONPATH}:/plugins"
 
 WORKDIR /opt/mailman-web
 

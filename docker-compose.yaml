@@ -3,10 +3,12 @@ version: '2'
 services:
   mailman-core:
     image: mailman-core:latest
+    build: ./core
     hostname: mailman-core
     volumes:
       - ./mailman/mailman-extra.cfg:/opt/mailman/mailman-extra.cfg
       - ./db:/opt/mailmandb
+      - ./plugins:/plugins
     stop_grace_period: 30s
     environment:
       - DATABASE_TYPE=sqlite
@@ -23,6 +25,7 @@ services:
 
   mailman-web:
     image: mailman-web:latest
+    build: ./web
     hostname: mailman-web
     depends_on:
       - mailman-core
@@ -32,6 +35,7 @@ services:
       - ./mailman/web:/opt/mailman-web-data
       - ./messages:/tmp/mailman-messages
       - ./db:/opt/mailmandb
+      - ./plugins:/plugins
     environment:
       - DATABASE_TYPE=sqlite
       - DATABASE_URL=sqlite:////opt/mailmandb/mailmanweb.db
