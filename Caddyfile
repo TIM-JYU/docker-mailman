@@ -1,0 +1,8 @@
+http:// {
+    route {
+        file_server /mailman3/static/* {
+            root /var/www
+        }
+        reverse_proxy /mailman3/* mailman-web:8000
+    }
+}

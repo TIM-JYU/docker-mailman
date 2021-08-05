@@ -8,4 +8,4 @@ pythonenv3.8/*
 /db
 /mailman
 /messages
-Caddyfile
+/plugins
