@@ -11,6 +11,7 @@ RUN apk update \
                    gunicorn==19.9.0 \
                    mailman==3.3.4 \
                    mailman-hyperkitty==1.1.0 \
+                   mailman-rest-event-tim \
                    pymysql \
                    'sqlalchemy<1.4.0' \
  # Also install nano for easy text editing

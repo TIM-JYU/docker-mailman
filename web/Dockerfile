@@ -14,6 +14,7 @@ RUN set -ex \
 		postorius==1.3.4 \
 		hyperkitty==1.3.4 \
 		django-mailman3==1.3.5 \
+		allauth-tim \
 		whoosh \
 		uwsgi \
 		psycopg2 \
