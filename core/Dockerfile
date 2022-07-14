@@ -22,6 +22,7 @@ RUN apk update \
 #Add startup script to container
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY assets/scripts /usr/mailman_scripts
+COPY assets/tim /usr/mailman_tim
 
 RUN mkdir /plugins
 ENV PYTHONPATH "${PYTHONPATH}:/plugins"

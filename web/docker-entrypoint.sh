@@ -1,6 +1,13 @@
 #! /bin/bash
 set -e
 
+if [[ -v TIM_DEV ]]; then
+	echo "Setting up TIM development environment ..."
+	if [[ ! -e /opt/mailman-web-data/settings_local.py ]]; then
+		echo "Creating /opt/mailman-web-data/settings_local.py"
+		cp /usr/mailman_tim/settings_local.py /opt/mailman-web-data/settings_local.py
+	fi
+fi
 
 function wait_for_postgres () {
 	# Check if the postgres database is up and accepting connections before

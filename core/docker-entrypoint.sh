@@ -1,6 +1,18 @@
 #! /bin/bash
 set -e
 
+if [[ -v TIM_DEV ]]; then
+	echo "Initializing tim dev files"
+	if [[ ! -e /opt/mailman/mailman-extra.cfg ]]; then
+		echo "Creating /opt/mailman/mailman-extra.cfg"
+		cp /usr/mailman_tim/mailman-extra.cfg /opt/mailman/mailman-extra.cfg
+	fi
+	if [[ ! -e /opt/mailman/mailman-rest-event.cfg ]]; then
+		echo "Creating /opt/mailman/mailman-rest-event.cfg"
+		cp /usr/mailman_tim/mailman-rest-event.cfg /opt/mailman/mailman-rest-event.cfg
+	fi
+fi
+
 function wait_for_postgres () {
 	# Check if the postgres database is up and accepting connections before
 	# moving forward.

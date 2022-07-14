@@ -31,6 +31,7 @@ RUN set -ex \
 COPY mailman-web /opt/mailman-web
 # Add startup script to container
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY tim /usr/mailman_tim
 
 ## Add proper groups
 RUN addgroup -S mailman \
@@ -40,6 +41,8 @@ RUN addgroup -S mailman \
 
 RUN mkdir /plugins
 ENV PYTHONPATH "${PYTHONPATH}:/plugins"
+
+RUN mkdir -p /opt/mailman-web-data
 
 WORKDIR /opt/mailman-web
 
